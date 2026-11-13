@@ -1,0 +1,5 @@
+# dsh-bitwarden：密码库连接器
+# 单包单插件：Host 侧负责 bw CLI 引擎、策略层、工具面与 RPC；Client 侧是设置页「密码库」。
+- insert:
+    - id: dsh-bitwarden
+      name: dsh-bitwarden
