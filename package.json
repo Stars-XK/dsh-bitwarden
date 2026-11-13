@@ -37,5 +37,10 @@
         "@deepseek-ai/dsh-client-locale"
       ]
     }
+  },
+  "scripts": {
+    "build:client": "node client/build.mjs",
+    "sync-index": "node scripts/sync-index.mjs",
+    "check-index": "node scripts/sync-index.mjs --check"
   }
 }

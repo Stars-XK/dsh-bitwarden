@@ -60,11 +60,11 @@
       "versions": [
         {
           "version": "0.1.0",
-          "publishTimestamp": 1794556307,
+          "publishTimestamp": 1794556582,
           "source": {
             "type": "git",
             "url": "https://gitee.com/Stars-FX/dsh-bitwarden",
-            "commit": "8230c8916b261875122cf5bfe12ab86be41f2d6c"
+            "commit": "82d6d154aecd886162fa21ceb294b24ae27e7108"
           },
           "engines": {
             "dsh": ">=0.2.0"
