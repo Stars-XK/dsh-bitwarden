@@ -1,0 +1,76 @@
+{
+  "format": 1,
+  "title": {
+    "zh": "Stars-FX 的 DSH 插件",
+    "en": "Stars-FX DSH Plugins"
+  },
+  "description": {
+    "zh": "凝萌（Stars-FX）维护的 DeepSeek Harness 插件索引。",
+    "en": "DeepSeek Harness plugin index maintained by Stars-FX."
+  },
+  "metadata": {
+    "categories": {
+      "security": {
+        "title": {
+          "zh": "安全与密码",
+          "en": "Security & Secrets"
+        }
+      },
+      "utilities": {
+        "title": {
+          "zh": "实用工具",
+          "en": "Utilities"
+        }
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "dsh-bitwarden",
+      "title": {
+        "zh": "Bitwarden 密码库",
+        "en": "Bitwarden Vault"
+      },
+      "description": {
+        "zh": "把 Bitwarden / Vaultwarden 接进 DSH。设置页提供 Bitwarden 扩展风格的密码库：搜索、类型筛选、按文件夹分组、详情查看、新建与编辑。AI 只能检索条目元数据，密码通过受控执行通道注入子进程使用，明文不进入对话或会话日志；带本地审计日志与空闲自动锁定。",
+        "en": "Connect a Bitwarden or Vaultwarden vault to DSH. The Settings page offers a Bitwarden-extension-style vault: search, type filters, folder grouping, details, create and edit. The agent only reads item metadata; passwords are used through a controlled execution channel and never enter the conversation or session log, with a local audit log and idle auto-lock."
+      },
+      "author": "Stars-FX",
+      "homepage": "https://gitee.com/Stars-FX/dsh-bitwarden",
+      "repository": {
+        "url": "https://gitee.com/Stars-FX/dsh-bitwarden"
+      },
+      "metadata": {
+        "category": "security",
+        "keywords": [
+          "dsh-plugin",
+          "bitwarden",
+          "vaultwarden",
+          "password-manager",
+          "self-hosted",
+          "security",
+          "密码",
+          "密码库",
+          "自建服务"
+        ],
+        "labels": [
+          "git"
+        ]
+      },
+      "versions": [
+        {
+          "version": "0.1.0",
+          "publishTimestamp": 1794556307,
+          "source": {
+            "type": "git",
+            "url": "https://gitee.com/Stars-FX/dsh-bitwarden",
+            "commit": "8230c8916b261875122cf5bfe12ab86be41f2d6c"
+          },
+          "engines": {
+            "dsh": ">=0.2.0"
+          }
+        }
+      ]
+    }
+  ]
+}
