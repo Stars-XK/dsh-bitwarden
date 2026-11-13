@@ -29,12 +29,41 @@
 
 ## 安装
 
-### 1. 作为本地插件安装
+插件本身是通用的：不绑定任何特定服务器，装好后在设置页填自己的 Bitwarden / Vaultwarden 地址和账号即可。
 
-把本仓库放到任意目录，然后在 DSH 里：
+### 方式一：从 Gitee 直接装（推荐）
 
-- 打开 **设置 → 插件 → 添加插件**，选择本目录；或
-- 用插件管理接口安装本地目录。
+在 DSH 里打开 **设置 → 插件 → 添加插件**，填入：
+
+```
+git+https://gitee.com/Stars-FX/dsh-bitwarden.git
+```
+
+或者用命令行：
+
+```bash
+dsh plugin add git+https://gitee.com/Stars-FX/dsh-bitwarden.git
+```
+
+> **首次安装会提示批准 `core-js` 的构建脚本**
+> `@bitwarden/cli` 的间接依赖 `core-js` 带一个 postinstall 脚本，DSH 默认拦截未批准的构建脚本。
+> 在插件管理器里点批准（或 `dsh plugin approve-builds` 后选 `core-js`）即可，之后不会再问。
+
+### 方式二：npm（发布后）
+
+```bash
+dsh plugin add dsh-bitwarden
+```
+
+### 方式三：本地目录
+
+把仓库下载到任意目录，**设置 → 插件 → 添加插件** 选这个目录。适合改代码、调试。
+
+### 安装后
+
+1. 重启 DSH（或按提示重载插件）。
+2. 打开 **设置 → 密码库**，填写服务器地址、邮箱、主密码，点 **登录并解锁**。
+3. 如果页面里没有「密码库」入口，刷新一次浏览器页面——客户端模块需要重新进 boot graph。
 
 安装时会把 `@bitwarden/cli` 作为依赖一并装入当前 profile。
 
