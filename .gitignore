@@ -4,3 +4,7 @@ node_modules/
 .env
 .env.*
 *.local
+
+# GitHub token 临时文件（放在 workspace 根，不入库）
+.github-token
+.github-token.*
