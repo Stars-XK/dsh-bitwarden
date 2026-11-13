@@ -148,6 +148,20 @@ node client/build.mjs   # 生成 client/client.js
 
 修改 `client/src/index.jsx` 后需要重新构建；安装/替换插件后需要刷新页面让客户端模块进入 boot graph。
 
+## 插件市场索引
+
+本仓库同时自带一个 DSH 插件市场索引，可直接加入 DSH 的「发现」页：
+
+```
+https://gitee.com/Stars-FX/dsh-bitwarden/raw/main/data/dsh-market-index.json
+```
+
+添加方式：打开 **插件 → 发现（Discover）**，点空状态里的 **添加索引源**；已经有索引时，从左上角索引菜单末尾选 **管理索引源…**，把上面的地址粘进去。
+
+添加后就能在发现页搜到「Bitwarden 密码库」，点 **安装** 即可。
+
+索引文件是 `data/dsh-market-index.json`，其中 `versions[].source.commit` 必须指向实际包含插件代码的 commit。改了代码并推送后，要同步更新这个 commit，市场里的「更新」才会指向新版本。
+
 ## 许可证
 
 [MIT](LICENSE)
