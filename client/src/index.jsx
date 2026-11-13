@@ -29,6 +29,8 @@ const CSS = `
 .dsh-bw-chip { font-size:12px; padding:3px 8px; border-radius:999px; border:1px solid var(--dsw-alias-border-l1); color:var(--dsw-alias-label-secondary); background:transparent; cursor:pointer; }
 .dsh-bw-chip.on { border-color:var(--dsw-alias-brand-primary); color:var(--dsw-alias-brand-primary); }
 .dsh-bw-list { max-height:440px; overflow:auto; }
+.dsh-bw-folders { display:flex; gap:5px; padding:0 9px 8px; flex-wrap:nowrap; overflow-x:auto; scrollbar-width:thin; }
+.dsh-bw-group-head { font-size:11px; font-weight:600; letter-spacing:.2px; color:var(--dsw-alias-label-secondary); padding:7px 11px 5px; background:var(--dsw-alias-bg-layer-2); position:sticky; top:0; z-index:1; }
 .dsh-bw-item { display:block; width:100%; text-align:left; padding:9px 11px; border:0; border-bottom:1px solid var(--dsw-alias-border-l1); background:transparent; cursor:pointer; color:var(--dsw-alias-label-primary); }
 .dsh-bw-item:hover { background:var(--dsw-alias-bg-layer-2); }
 .dsh-bw-item.on { background:var(--dsw-alias-bg-layer-2); box-shadow:inset 3px 0 0 var(--dsw-alias-brand-primary); }
@@ -74,6 +76,7 @@ function VaultSection({ rpcCall, t }) {
   const [status, setStatus] = useState(null)
   const [items, setItems] = useState([])
   const [folders, setFolders] = useState([])
+  const [folderFilter, setFolderFilter] = useState('all')
   const [query, setQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
   const [selectedId, setSelectedId] = useState(null)
@@ -229,6 +232,7 @@ function VaultSection({ rpcCall, t }) {
       setUnlockPassword('')
       setOk(t('unlocked'))
       await loadItems(query, typeFilter)
+      loadFolders()
     } catch (error) {
       setErr(error)
     } finally {
@@ -339,8 +343,46 @@ function VaultSection({ rpcCall, t }) {
     return 'dsh-bw-dot warn'
   }, [status])
 
-  const filtered = items
   const authed = Boolean(status && status.cliStatus !== 'unauthenticated')
+
+  const foldersById = useMemo(() => {
+    const map = {}
+    for (const folder of folders) map[folder.id] = folder.name
+    return map
+  }, [folders])
+
+  const filtered = useMemo(() => items.filter((item) => {
+    if (folderFilter === 'all') return true
+    if (folderFilter === '__none__') return !item.folderId
+    return item.folderId === folderFilter
+  }), [items, folderFilter])
+
+  const groups = useMemo(() => {
+    if (folderFilter !== 'all') return null
+    const map = new Map()
+    for (const item of filtered) {
+      const key = item.folderId || '__none__'
+      if (!map.has(key)) map.set(key, [])
+      map.get(key).push(item)
+    }
+    return [...map.entries()].sort((a, b) => {
+      const an = a[0] === '__none__' ? '\uffff' : (foldersById[a[0]] || '')
+      const bn = b[0] === '__none__' ? '\uffff' : (foldersById[b[0]] || '')
+      return an.localeCompare(bn, 'zh')
+    })
+  }, [filtered, folderFilter, foldersById])
+
+  const renderItem = (item) => (
+    <button key={item.id} type="button"
+      className={`dsh-bw-item ${selectedId === item.id ? 'on' : ''}`}
+      onClick={() => openDetail(item.id)}>
+      <div className="dsh-bw-item-name">{item.name || t('list.untitled')}</div>
+      <div className="dsh-bw-item-sub">
+        {[item.username, item.uris?.[0], t(TYPE_KEY[item.type] ?? 'type.login')]
+          .filter(Boolean).join(' · ')}
+      </div>
+    </button>
+  )
 
   return (
     <div className="dsh-bw">
@@ -431,20 +473,35 @@ function VaultSection({ rpcCall, t }) {
                 </button>
               ))}
             </div>
+            {folders.length > 0 ? (
+              <div className="dsh-bw-folders">
+                <button type="button" className={`dsh-bw-chip ${folderFilter === 'all' ? 'on' : ''}`}
+                  onClick={() => setFolderFilter('all')}>{t('filter.folder.all')}</button>
+                <button type="button" className={`dsh-bw-chip ${folderFilter === '__none__' ? 'on' : ''}`}
+                  onClick={() => setFolderFilter('__none__')}>{t('filter.folder.none')}</button>
+                {folders.filter((folder) => folder.name).map((folder) => (
+                  <button key={folder.id} type="button"
+                    className={`dsh-bw-chip ${folderFilter === folder.id ? 'on' : ''}`}
+                    onClick={() => setFolderFilter(folder.id)}>{folder.name}</button>
+                ))}
+              </div>
+            ) : null}
             <div className="dsh-bw-list">
               {filtered.length === 0 ? (
                 <div className="dsh-bw-empty">{busy ? t('list.loading') : t('list.empty')}</div>
-              ) : filtered.map((item) => (
-                <button key={item.id} type="button"
-                  className={`dsh-bw-item ${selectedId === item.id ? 'on' : ''}`}
-                  onClick={() => openDetail(item.id)}>
-                  <div className="dsh-bw-item-name">{item.name || t('list.untitled')}</div>
-                  <div className="dsh-bw-item-sub">
-                    {[item.username, item.uris?.[0], t(TYPE_KEY[item.type] ?? 'type.login')]
-                      .filter(Boolean).join(' · ')}
+              ) : groups ? (
+                groups.map(([folderId, groupItems]) => (
+                  <div key={folderId}>
+                    <div className="dsh-bw-group-head">
+                      {folderId === '__none__' ? t('filter.folder.none') : (foldersById[folderId] || t('filter.folder.none'))}
+                      {' · '}{groupItems.length}
+                    </div>
+                    {groupItems.map(renderItem)}
                   </div>
-                </button>
-              ))}
+                ))
+              ) : (
+                filtered.map(renderItem)
+              )}
             </div>
           </div>
 
@@ -605,6 +662,8 @@ const ZH = {
   'locked.submit': '解锁',
   'search.placeholder': '搜索名称、用户名或网址',
   'filter.all': '全部',
+  'filter.folder.all': '全部文件夹',
+  'filter.folder.none': '未分类',
   'list.loading': '加载中…',
   'list.empty': '没有匹配的条目',
   'list.untitled': '未命名',
@@ -672,6 +731,8 @@ const EN = {
   'locked.submit': 'Unlock',
   'search.placeholder': 'Search name, username or URL',
   'filter.all': 'All',
+  'filter.folder.all': 'All folders',
+  'filter.folder.none': 'Unfiled',
   'list.loading': 'Loading…',
   'list.empty': 'No matching item',
   'list.untitled': 'Untitled',

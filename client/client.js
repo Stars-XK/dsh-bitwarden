@@ -58,6 +58,8 @@ var CSS = `
 .dsh-bw-chip { font-size:12px; padding:3px 8px; border-radius:999px; border:1px solid var(--dsw-alias-border-l1); color:var(--dsw-alias-label-secondary); background:transparent; cursor:pointer; }
 .dsh-bw-chip.on { border-color:var(--dsw-alias-brand-primary); color:var(--dsw-alias-brand-primary); }
 .dsh-bw-list { max-height:440px; overflow:auto; }
+.dsh-bw-folders { display:flex; gap:5px; padding:0 9px 8px; flex-wrap:nowrap; overflow-x:auto; scrollbar-width:thin; }
+.dsh-bw-group-head { font-size:11px; font-weight:600; letter-spacing:.2px; color:var(--dsw-alias-label-secondary); padding:7px 11px 5px; background:var(--dsw-alias-bg-layer-2); position:sticky; top:0; z-index:1; }
 .dsh-bw-item { display:block; width:100%; text-align:left; padding:9px 11px; border:0; border-bottom:1px solid var(--dsw-alias-border-l1); background:transparent; cursor:pointer; color:var(--dsw-alias-label-primary); }
 .dsh-bw-item:hover { background:var(--dsw-alias-bg-layer-2); }
 .dsh-bw-item.on { background:var(--dsw-alias-bg-layer-2); box-shadow:inset 3px 0 0 var(--dsw-alias-brand-primary); }
@@ -93,6 +95,7 @@ function VaultSection({ rpcCall: rpcCall2, t }) {
   const [status, setStatus] = (0, import_react.useState)(null);
   const [items, setItems] = (0, import_react.useState)([]);
   const [folders, setFolders] = (0, import_react.useState)([]);
+  const [folderFilter, setFolderFilter] = (0, import_react.useState)("all");
   const [query, setQuery] = (0, import_react.useState)("");
   const [typeFilter, setTypeFilter] = (0, import_react.useState)("all");
   const [selectedId, setSelectedId] = (0, import_react.useState)(null);
@@ -235,6 +238,7 @@ function VaultSection({ rpcCall: rpcCall2, t }) {
       setUnlockPassword("");
       setOk(t("unlocked"));
       await loadItems(query, typeFilter);
+      loadFolders();
     } catch (error) {
       setErr(error);
     } finally {
@@ -336,8 +340,42 @@ function VaultSection({ rpcCall: rpcCall2, t }) {
     if (status.status === "unlocked") return "dsh-bw-dot on";
     return "dsh-bw-dot warn";
   }, [status]);
-  const filtered = items;
   const authed = Boolean(status && status.cliStatus !== "unauthenticated");
+  const foldersById = (0, import_react.useMemo)(() => {
+    const map = {};
+    for (const folder of folders) map[folder.id] = folder.name;
+    return map;
+  }, [folders]);
+  const filtered = (0, import_react.useMemo)(() => items.filter((item) => {
+    if (folderFilter === "all") return true;
+    if (folderFilter === "__none__") return !item.folderId;
+    return item.folderId === folderFilter;
+  }), [items, folderFilter]);
+  const groups = (0, import_react.useMemo)(() => {
+    if (folderFilter !== "all") return null;
+    const map = /* @__PURE__ */ new Map();
+    for (const item of filtered) {
+      const key = item.folderId || "__none__";
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(item);
+    }
+    return [...map.entries()].sort((a, b) => {
+      const an = a[0] === "__none__" ? "\uFFFF" : foldersById[a[0]] || "";
+      const bn = b[0] === "__none__" ? "\uFFFF" : foldersById[b[0]] || "";
+      return an.localeCompare(bn, "zh");
+    });
+  }, [filtered, folderFilter, foldersById]);
+  const renderItem = (item) => /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      key: item.id,
+      type: "button",
+      className: `dsh-bw-item ${selectedId === item.id ? "on" : ""}`,
+      onClick: () => openDetail(item.id)
+    },
+    /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-item-name" }, item.name || t("list.untitled")),
+    /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-item-sub" }, [item.username, item.uris?.[0], t(TYPE_KEY[item.type] ?? "type.login")].filter(Boolean).join(" \xB7 "))
+  );
   return /* @__PURE__ */ React.createElement("div", { className: "dsh-bw" }, /* @__PURE__ */ React.createElement("style", null, CSS), /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-bar" }, /* @__PURE__ */ React.createElement("span", { className: "dsh-bw-badge" }, /* @__PURE__ */ React.createElement("span", { className: dotClass }), statusLabel), status?.email ? /* @__PURE__ */ React.createElement("span", { className: "dsh-bw-badge" }, status.email) : null, status?.serverUrl ? /* @__PURE__ */ React.createElement("span", { className: "dsh-bw-badge" }, status.serverUrl) : null, /* @__PURE__ */ React.createElement("span", { className: "dsh-bw-spacer" }), view !== "vault" ? /* @__PURE__ */ React.createElement(Btn, { sm: true, ghost: true, onClick: () => setView("vault") }, t("nav.vault")) : null, view !== "create" ? /* @__PURE__ */ React.createElement(Btn, { sm: true, onClick: () => setView("create") }, t("nav.create")) : null, view !== "settings" ? /* @__PURE__ */ React.createElement(Btn, { sm: true, onClick: () => setView("settings") }, t("nav.settings")) : null, view !== "audit" ? /* @__PURE__ */ React.createElement(Btn, { sm: true, onClick: () => {
     setView("audit");
     loadAudit();
@@ -404,17 +442,32 @@ function VaultSection({ rpcCall: rpcCall2, t }) {
       onClick: () => setTypeFilter(key)
     },
     t(key === "all" ? "filter.all" : `type.${key}`)
-  ))), /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-list" }, filtered.length === 0 ? /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-empty" }, busy ? t("list.loading") : t("list.empty")) : filtered.map((item) => /* @__PURE__ */ React.createElement(
+  ))), folders.length > 0 ? /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-folders" }, /* @__PURE__ */ React.createElement(
     "button",
     {
-      key: item.id,
       type: "button",
-      className: `dsh-bw-item ${selectedId === item.id ? "on" : ""}`,
-      onClick: () => openDetail(item.id)
+      className: `dsh-bw-chip ${folderFilter === "all" ? "on" : ""}`,
+      onClick: () => setFolderFilter("all")
     },
-    /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-item-name" }, item.name || t("list.untitled")),
-    /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-item-sub" }, [item.username, item.uris?.[0], t(TYPE_KEY[item.type] ?? "type.login")].filter(Boolean).join(" \xB7 "))
-  )))), /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-pane" }, !detail ? /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-empty" }, t("detail.empty")) : /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-detail" }, /* @__PURE__ */ React.createElement("h4", { className: "dsh-bw-title" }, detail.name || t("list.untitled")), /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-sub" }, t(TYPE_KEY[detail.type] ?? "type.login")), detail.login?.username !== void 0 ? /* @__PURE__ */ React.createElement(
+    t("filter.folder.all")
+  ), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      type: "button",
+      className: `dsh-bw-chip ${folderFilter === "__none__" ? "on" : ""}`,
+      onClick: () => setFolderFilter("__none__")
+    },
+    t("filter.folder.none")
+  ), folders.filter((folder) => folder.name).map((folder) => /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      key: folder.id,
+      type: "button",
+      className: `dsh-bw-chip ${folderFilter === folder.id ? "on" : ""}`,
+      onClick: () => setFolderFilter(folder.id)
+    },
+    folder.name
+  ))) : null, /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-list" }, filtered.length === 0 ? /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-empty" }, busy ? t("list.loading") : t("list.empty")) : groups ? groups.map(([folderId, groupItems]) => /* @__PURE__ */ React.createElement("div", { key: folderId }, /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-group-head" }, folderId === "__none__" ? t("filter.folder.none") : foldersById[folderId] || t("filter.folder.none"), " \xB7 ", groupItems.length), groupItems.map(renderItem))) : filtered.map(renderItem))), /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-pane" }, !detail ? /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-empty" }, t("detail.empty")) : /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-detail" }, /* @__PURE__ */ React.createElement("h4", { className: "dsh-bw-title" }, detail.name || t("list.untitled")), /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-sub" }, t(TYPE_KEY[detail.type] ?? "type.login")), detail.login?.username !== void 0 ? /* @__PURE__ */ React.createElement(
     Field,
     {
       label: t("field.username"),
@@ -529,6 +582,8 @@ var ZH = {
   "locked.submit": "\u89E3\u9501",
   "search.placeholder": "\u641C\u7D22\u540D\u79F0\u3001\u7528\u6237\u540D\u6216\u7F51\u5740",
   "filter.all": "\u5168\u90E8",
+  "filter.folder.all": "\u5168\u90E8\u6587\u4EF6\u5939",
+  "filter.folder.none": "\u672A\u5206\u7C7B",
   "list.loading": "\u52A0\u8F7D\u4E2D\u2026",
   "list.empty": "\u6CA1\u6709\u5339\u914D\u7684\u6761\u76EE",
   "list.untitled": "\u672A\u547D\u540D",
@@ -595,6 +650,8 @@ var EN = {
   "locked.submit": "Unlock",
   "search.placeholder": "Search name, username or URL",
   "filter.all": "All",
+  "filter.folder.all": "All folders",
+  "filter.folder.none": "Unfiled",
   "list.loading": "Loading\u2026",
   "list.empty": "No matching item",
   "list.untitled": "Untitled",
