@@ -1,5 +1,7 @@
 # dsh-bitwarden
 
+<img src="assets/icon-180.png" width="72" align="right" alt="dsh-bitwarden">
+
 把 **Bitwarden / Vaultwarden** 密码库接进 [DeepSeek Harness](https://github.com/deepseek-ai)。给 AI 一套「能用密码、但看不到密码」的工具面，同时给主人一个 Bitwarden 扩展风格的密码库页面。
 
 > 设计前提：AI 的职责是**用**密码，不是**看**密码。密码明文不进对话、不进会话日志、不进模型上下文。
