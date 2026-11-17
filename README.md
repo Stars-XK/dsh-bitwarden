@@ -23,27 +23,35 @@
 | `bitwarden_search` | 按名称 / 用户名 / 网址搜条目，返回元数据列表，可限类型和条数 |
 | `bitwarden_use` | 用某条目的密码执行 shell 命令，密码只进子进程环境变量，回显脱敏 |
 | `bitwarden_create` | 在密码库里新建登录条目 |
+| `bitwarden_update` | 改条目的名称 / 用户名 / 密码 / 网址 / 文件夹 / 备注，**只写不读** |
+| `bitwarden_folders` | 列出文件夹（含条目数），供 `bitwarden_search` / `bitwarden_update` 用 |
 | `bitwarden_status` | 连接状态、账号、上次同步、最后的错误 |
 
-没有「取密码」工具——这是设计，不是遗漏。
+一共 6 个工具。没有「取密码」工具——这是设计，不是遗漏。
 
 ## 安装
 
 插件本身是通用的：不绑定任何特定服务器，装好后在设置页填自己的 Bitwarden / Vaultwarden 地址和账号即可。
 
-### 方式一：从 Gitee 直接装（推荐）
+### 方式一：从 GitHub 直接装（推荐）
 
 在 DSH 里打开 **设置 → 插件 → 添加插件**，填入：
 
 ```
-git+https://gitee.com/Stars-FX/dsh-bitwarden.git
+git+https://github.com/Stars-XK/dsh-bitwarden.git
 ```
 
 或者用命令行：
 
 ```bash
-dsh plugin add git+https://gitee.com/Stars-FX/dsh-bitwarden.git
+dsh plugin add git+https://github.com/Stars-XK/dsh-bitwarden.git
 ```
+
+> **国内网络慢的话用 Gitee 镜像**，内容与 GitHub 一致：
+>
+> ```
+> git+https://gitee.com/Stars-FX/dsh-bitwarden.git
+> ```
 
 > **首次安装会提示批准 `core-js` 的构建脚本**
 > `@bitwarden/cli` 的间接依赖 `core-js` 带一个 postinstall 脚本，DSH 默认拦截未批准的构建脚本。

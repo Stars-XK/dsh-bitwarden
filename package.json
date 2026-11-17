@@ -1,9 +1,27 @@
 {
   "name": "dsh-bitwarden",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "type": "module",
   "description": "Bitwarden / Vaultwarden password vault for DeepSeek Harness: metadata-only agent tools, a use-without-reveal execution channel, and a Bitwarden-style vault page in Settings.",
+  "author": "Stars-XK",
+  "license": "MIT",
+  "homepage": "https://github.com/Stars-XK/dsh-bitwarden#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Stars-XK/dsh-bitwarden.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Stars-XK/dsh-bitwarden/issues"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "bitwarden",
+    "vaultwarden",
+    "password-manager",
+    "security"
+  ],
   "exports": {
     ".": "./index.js",
     "./client": "./client/client.js",
