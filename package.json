@@ -1,6 +1,6 @@
 {
   "name": "dsh-bitwarden",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "description": "Bitwarden / Vaultwarden password vault for DeepSeek Harness: metadata-only agent tools, a use-without-reveal execution channel, and a Bitwarden-style vault page in Settings.",

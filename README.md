@@ -144,7 +144,7 @@ bitwarden/
 
 - 同一时间只管理一个账号。
 - 依赖 `@bitwarden/cli` 与 Node ≥ 22。
-- 自建 Vaultwarden 版本低于客户端时，`bw login` 可能打出 `key_id_backfill` 404 的 SDK 日志；插件已用 `bw status` 复核，实际登录不受影响。
+- 自建 Vaultwarden 版本低于客户端时缺 `key_id_backfill` 端点，SDK 解锁后第一次跑回填迁移会抛 `KeyIdBackfillError`。插件重试一次即通过（失败那次同时写下 24 小时冷却），不会把这个错误抛给 AI 或页面；`bw login` 打出的 404 日志也已用 `bw status` 复核屏蔽。
 - 组织级 collection 的写入权限取决于 Vaultwarden 侧授权。
 - TOTP 取回永久排除。
 
