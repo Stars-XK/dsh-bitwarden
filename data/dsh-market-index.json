@@ -59,12 +59,12 @@
       },
       "versions": [
         {
-          "version": "0.1.0",
-          "publishTimestamp": 1794884268,
+          "version": "0.1.1",
+          "publishTimestamp": 1795494245,
           "source": {
             "type": "git",
             "url": "https://gitee.com/Stars-FX/dsh-bitwarden",
-            "commit": "32ad83f19acf70edf85bfc90cd039824d4f39a58"
+            "commit": "d3df77b54331eb1bc55c95aa752201c46219c421"
           },
           "engines": {
             "dsh": ">=0.2.0"
