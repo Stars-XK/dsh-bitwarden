@@ -1,6 +1,6 @@
 {
   "name": "dsh-bitwarden",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": false,
   "type": "module",
   "description": "Bitwarden / Vaultwarden password vault for DeepSeek Harness: metadata-only agent tools, a use-without-reveal execution channel, and a Bitwarden-style vault page in Settings.",
@@ -59,6 +59,7 @@
   "scripts": {
     "build:client": "node client/build.mjs",
     "sync-index": "node scripts/sync-index.mjs",
-    "check-index": "node scripts/sync-index.mjs --check"
+    "check-index": "node scripts/sync-index.mjs --check",
+    "test": "node --test test/*.test.mjs"
   }
 }

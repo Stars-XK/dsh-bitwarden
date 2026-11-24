@@ -88,7 +88,7 @@ function VaultSection({ rpcCall, t }) {
   const [loginForm, setLoginForm] = useState({ serverUrl: '', email: '', password: '', remember: true })
   const [unlockPassword, setUnlockPassword] = useState('')
   const [createForm, setCreateForm] = useState({ name: '', username: '', password: '', uris: '', notes: '' })
-  const [prefs, setPrefs] = useState({ idleLockMinutes: 15, autoUnlock: true, auditEnabled: true })
+  const [prefs, setPrefs] = useState({ idleLockMinutes: 15, autoUnlock: true, auditEnabled: true, requireApproval: true })
   const [audit, setAudit] = useState([])
   const searchTimer = useRef(null)
 
@@ -112,6 +112,7 @@ function VaultSection({ rpcCall, t }) {
         idleLockMinutes: next.idleLockMinutes ?? 15,
         autoUnlock: next.autoUnlock !== false,
         auditEnabled: next.auditEnabled !== false,
+        requireApproval: next.requireApproval !== false,
       })
       if (!loginForm.serverUrl && next.serverUrl) {
         setLoginForm((prev) => ({ ...prev, serverUrl: next.serverUrl }))
@@ -602,6 +603,11 @@ function VaultSection({ rpcCall, t }) {
                 onChange={(e) => savePrefs({ auditEnabled: e.target.checked })} />
               {t('prefs.audit')}
             </label>
+            <label className="dsh-bw-hint" style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+              <input type="checkbox" checked={prefs.requireApproval}
+                onChange={(e) => savePrefs({ requireApproval: e.target.checked })} />
+              {t('prefs.approval')}
+            </label>
             <div className="dsh-bw-bar">
               <Btn danger onClick={forgetMaster}>{t('prefs.forget')}</Btn>
             </div>
@@ -679,6 +685,7 @@ const ZH = {
   'prefs.idleHint': '超过该时长没有访问时自动执行 bw lock 并丢弃会话密钥。',
   'prefs.autoUnlock': '允许 AI 在需要时用已保存的主密码自动解锁',
   'prefs.audit': '记录审计日志',
+  'prefs.approval': 'AI 每次用密码执行命令都要我批准',
   'prefs.forget': '删除已保存的主密码',
   'prefs.dataDir': '数据目录：',
   'prefs.bw': 'bw 引擎：',
@@ -748,6 +755,7 @@ const EN = {
   'prefs.idleHint': 'Runs bw lock and drops the session key after this much inactivity.',
   'prefs.autoUnlock': 'Let the agent auto-unlock with the saved master password',
   'prefs.audit': 'Record the audit log',
+  'prefs.approval': 'Ask me before the agent runs a command with a vault password',
   'prefs.forget': 'Delete the saved master password',
   'prefs.dataDir': 'Data directory:',
   'prefs.bw': 'bw engine:',

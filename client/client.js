@@ -107,7 +107,7 @@ function VaultSection({ rpcCall: rpcCall2, t }) {
   const [loginForm, setLoginForm] = (0, import_react.useState)({ serverUrl: "", email: "", password: "", remember: true });
   const [unlockPassword, setUnlockPassword] = (0, import_react.useState)("");
   const [createForm, setCreateForm] = (0, import_react.useState)({ name: "", username: "", password: "", uris: "", notes: "" });
-  const [prefs, setPrefs] = (0, import_react.useState)({ idleLockMinutes: 15, autoUnlock: true, auditEnabled: true });
+  const [prefs, setPrefs] = (0, import_react.useState)({ idleLockMinutes: 15, autoUnlock: true, auditEnabled: true, requireApproval: true });
   const [audit, setAudit] = (0, import_react.useState)([]);
   const searchTimer = (0, import_react.useRef)(null);
   const call = (0, import_react.useCallback)(async (endpoint, payload) => {
@@ -127,7 +127,8 @@ function VaultSection({ rpcCall: rpcCall2, t }) {
       setPrefs({
         idleLockMinutes: next.idleLockMinutes ?? 15,
         autoUnlock: next.autoUnlock !== false,
-        auditEnabled: next.auditEnabled !== false
+        auditEnabled: next.auditEnabled !== false,
+        requireApproval: next.requireApproval !== false
       });
       if (!loginForm.serverUrl && next.serverUrl) {
         setLoginForm((prev) => ({ ...prev, serverUrl: next.serverUrl }));
@@ -549,7 +550,14 @@ function VaultSection({ rpcCall: rpcCall2, t }) {
       checked: prefs.auditEnabled,
       onChange: (e) => savePrefs({ auditEnabled: e.target.checked })
     }
-  ), t("prefs.audit")), /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-bar" }, /* @__PURE__ */ React.createElement(Btn, { danger: true, onClick: forgetMaster }, t("prefs.forget"))), /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-hint" }, t("prefs.dataDir"), " ", status?.dataDir ?? "\u2014"), /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-hint" }, t("prefs.bw"), " ", status?.bwScript ?? t("prefs.bwMissing")))) : null, authed && view === "audit" ? /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-pane" }, /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-audit" }, audit.length === 0 ? /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-empty" }, t("audit.empty")) : audit.map((entry, index) => /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-audit-row", key: `${entry.at}-${index}` }, /* @__PURE__ */ React.createElement("span", { className: "dsh-bw-audit-at" }, String(entry.at ?? "").replace("T", " ").slice(0, 19)), /* @__PURE__ */ React.createElement("span", null, entry.action, entry.name ? ` \xB7 ${entry.name}` : "", entry.result ? ` \xB7 ${entry.result}` : ""))))) : null);
+  ), t("prefs.audit")), /* @__PURE__ */ React.createElement("label", { className: "dsh-bw-hint", style: { display: "flex", gap: 6, alignItems: "center" } }, /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      type: "checkbox",
+      checked: prefs.requireApproval,
+      onChange: (e) => savePrefs({ requireApproval: e.target.checked })
+    }
+  ), t("prefs.approval")), /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-bar" }, /* @__PURE__ */ React.createElement(Btn, { danger: true, onClick: forgetMaster }, t("prefs.forget"))), /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-hint" }, t("prefs.dataDir"), " ", status?.dataDir ?? "\u2014"), /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-hint" }, t("prefs.bw"), " ", status?.bwScript ?? t("prefs.bwMissing")))) : null, authed && view === "audit" ? /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-pane" }, /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-audit" }, audit.length === 0 ? /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-empty" }, t("audit.empty")) : audit.map((entry, index) => /* @__PURE__ */ React.createElement("div", { className: "dsh-bw-audit-row", key: `${entry.at}-${index}` }, /* @__PURE__ */ React.createElement("span", { className: "dsh-bw-audit-at" }, String(entry.at ?? "").replace("T", " ").slice(0, 19)), /* @__PURE__ */ React.createElement("span", null, entry.action, entry.name ? ` \xB7 ${entry.name}` : "", entry.result ? ` \xB7 ${entry.result}` : ""))))) : null);
 }
 var ZH = {
   section: "\u5BC6\u7801\u5E93",
@@ -599,6 +607,7 @@ var ZH = {
   "prefs.idleHint": "\u8D85\u8FC7\u8BE5\u65F6\u957F\u6CA1\u6709\u8BBF\u95EE\u65F6\u81EA\u52A8\u6267\u884C bw lock \u5E76\u4E22\u5F03\u4F1A\u8BDD\u5BC6\u94A5\u3002",
   "prefs.autoUnlock": "\u5141\u8BB8 AI \u5728\u9700\u8981\u65F6\u7528\u5DF2\u4FDD\u5B58\u7684\u4E3B\u5BC6\u7801\u81EA\u52A8\u89E3\u9501",
   "prefs.audit": "\u8BB0\u5F55\u5BA1\u8BA1\u65E5\u5FD7",
+  "prefs.approval": "AI \u6BCF\u6B21\u7528\u5BC6\u7801\u6267\u884C\u547D\u4EE4\u90FD\u8981\u6211\u6279\u51C6",
   "prefs.forget": "\u5220\u9664\u5DF2\u4FDD\u5B58\u7684\u4E3B\u5BC6\u7801",
   "prefs.dataDir": "\u6570\u636E\u76EE\u5F55\uFF1A",
   "prefs.bw": "bw \u5F15\u64CE\uFF1A",
@@ -667,6 +676,7 @@ var EN = {
   "prefs.idleHint": "Runs bw lock and drops the session key after this much inactivity.",
   "prefs.autoUnlock": "Let the agent auto-unlock with the saved master password",
   "prefs.audit": "Record the audit log",
+  "prefs.approval": "Ask me before the agent runs a command with a vault password",
   "prefs.forget": "Delete the saved master password",
   "prefs.dataDir": "Data directory:",
   "prefs.bw": "bw engine:",

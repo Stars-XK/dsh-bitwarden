@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "Bitwarden vault",
-    "description": "Connects a Bitwarden or Vaultwarden vault to DeepSeek Harness. Open Settings → Vault to sign in, browse, create and edit login items. The agent can search item metadata and use passwords through a controlled execution channel, but password values never enter the conversation: tools return names, usernames and URLs only, and command output is scrubbed of the secret. The master password is kept in the system credential store, an append-only audit log records every vault access, and the vault locks itself after an idle period. Turning the plugin off removes the tools immediately; stored credentials stay in the credential store until you delete them."
+    "description": "Connects a Bitwarden or Vaultwarden vault to DeepSeek Harness. Open Settings → Vault to sign in, browse, create and edit login items. The agent can search item metadata and use passwords through a controlled execution channel, but password values never enter the conversation: tools return names, usernames and URLs only, and command output is scrubbed of the secret. The master password is kept in dsh's credential store (a private file on the host, not an encrypted keychain), and the agent asks for approval before every command it runs with a password, an append-only audit log records every vault access, and the vault locks itself after an idle period. Turning the plugin off removes the tools immediately; stored credentials stay in the credential store until you delete them."
   }
 }
